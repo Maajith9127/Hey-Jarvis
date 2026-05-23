@@ -1,0 +1,129 @@
+name: 🚀 Deploy Backend to EC2 (Final Stable Version)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Environment info
+      - name: Debug - Environment Info
+        run: |
+          echo "🧠 Environment info:"
+          echo "PWD: $(pwd)"
+          echo "Files in repo root:"
+          ls -la
+          echo "Node (if preinstalled):"
+          node -v || echo "Node not installed"
+
+      # 3️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 4️⃣ Install dependencies
+      - name: Install Dependencies
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci || npm install
+          echo "✅ Dependencies installed."
+
+      # 5️⃣ Setup SSH key
+      - name: Setup SSH Key
+        run: |
+          echo "🔐 Setting up SSH key..."
+          echo "${{ secrets.BACKEND_DEPLOY_KEY }}" > backend_key.pem
+          chmod 600 backend_key.pem
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
+          echo "🌐 Adding EC2 host to known_hosts..."
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          echo "✅ SSH key setup complete."
+          ssh-keygen -lf backend_key.pem | awk '{print "🔎 Fingerprint:", $2, $3}'
+
+      # 6️⃣ Debug - Secrets and connectivity
+      - name: Debug - Verify Secrets & Network
+        continue-on-error: true
+        run: |
+          echo "🧩 Verifying GitHub Secrets..."
+          echo "✅ EC2_USER: ${{ secrets.EC2_USER }}"
+          echo "✅ EC2_HOST: ${{ secrets.EC2_HOST }}"
+          echo "🔐 Private key lines: $(wc -l < backend_key.pem)"
+          echo "--- PING ---"
+          ping -c 2 ${{ secrets.EC2_HOST }} || echo "⚠️ Ping blocked (expected)"
+          echo "--- DNS ---"
+          dig ${{ secrets.EC2_HOST }} || echo "⚠️ DNS check failed"
+          echo "--- Port 22 ---"
+          nc -zv ${{ secrets.EC2_HOST }} 22 && echo "✅ Port 22 reachable" || echo "⚠️ Port 22 unreachable"
+          echo "--- GitHub Runner IP ---"
+          curl -s ifconfig.me || echo "⚠️ Could not fetch IP"
+
+      # 7️⃣ Test SSH connection
+      - name: Test SSH Connection
+        continue-on-error: true
+        run: |
+          echo "🌍 Testing SSH connection to ${{ secrets.EC2_HOST }}..."
+          ssh -vvv -i backend_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            echo "✅ SSH connected successfully!"
+            node -v || echo "Node not installed"
+            pm2 list || echo "PM2 not installed"
+          EOF
+
+      # 8️⃣ Deploy via SCP
+      - name: Deploy to EC2 via SCP
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.BACKEND_DEPLOY_KEY }}
+          source: "."
+          target: "~/jarvis-deploy-v2/backend"
+          rm: true
+          debug: true
+          timeout: 120s
+
+      # 9️⃣ Restart backend with PM2
+      - name: Restart PM2 on EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.BACKEND_DEPLOY_KEY }}
+          script: |
+            echo "🧠 Restarting backend..."
+            cd ~/jarvis-deploy-v2/backend
+            npm install --omit=dev
+
+            echo "🔁 Restarting PM2..."
+            pm2 stop all || true
+
+            echo "⚙️ Starting backend..."
+            pm2 start index.js --name jarvis-backend
+
+            echo "⚙️ Starting worker (case-sensitive path)..."
+            if [ -f utils/ScheduleComponents/workers/accountabilityWorker.js ]; then
+              pm2 start utils/ScheduleComponents/workers/accountabilityWorker.js --name acc-worker
+              echo "✅ Worker started successfully."
+            else
+              echo "⚠️ Worker script not found. Skipping..."
+            fi
+
+            pm2 save
+            pm2 list
+            echo "✅ Backend redeployed successfully!"
+
+      # 🔟 Optional Health Check
+      - name: Verify Backend Health (Optional)
+        continue-on-error: true
+        run: |
+          echo "🌍 Checking backend health endpoint..."
+          curl -s http://${{ secrets.EC2_HOST }}:3000/health || echo "⚠️ Health check endpoint not reachable (may not exist yet)"

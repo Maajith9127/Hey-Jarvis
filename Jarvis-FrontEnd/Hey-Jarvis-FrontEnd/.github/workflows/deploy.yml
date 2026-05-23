@@ -1,0 +1,91 @@
+name: 🚀 Deploy Frontend to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧹 Checkout code
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: 📦 Install dependencies
+        run: |
+          echo "🟡 Installing dependencies..."
+          cd jarvis-frontend
+          npm ci
+          echo "✅ Dependencies installed successfully."
+
+      - name: 🏗️ Build project
+        run: |
+          echo "🟡 Building project..."
+          cd jarvis-frontend
+          npm run build
+          echo "✅ Build complete. Contents of dist folder:"
+          ls -la dist
+
+      - name: 🔍 Debug SSH Key presence
+        run: |
+          echo "🔍 Checking SSH key variable..."
+          if [ -z "${{ secrets.FRONTEND_DEPLOY_KEY }}" ]; then
+            echo "❌ SSH key secret is missing!"
+            exit 1
+          else
+            echo "✅ SSH key secret detected."
+            echo "🔐 First 100 chars of key:"
+            echo "${{ secrets.FRONTEND_DEPLOY_KEY }}" | head -c 100
+          fi
+          echo "🌍 EC2 Host: ${{ secrets.EC2_HOST }}"
+          echo "👤 EC2 User: ${{ secrets.EC2_USER }}"
+        shell: bash
+
+      - name: 🌐 Test SSH connectivity
+        run: |
+          echo "🔍 Testing raw SSH connectivity..."
+          echo "${{ secrets.FRONTEND_DEPLOY_KEY }}" > /tmp/ec2_key.pem
+          chmod 600 /tmp/ec2_key.pem
+          echo "⏳ Trying to connect to ${{ secrets.EC2_HOST }} on port 22..."
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /tmp/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo ✅ SSH connected successfully." || (echo "❌ SSH connection test failed!" && exit 1)
+        shell: bash
+
+      - name: 📤 Deploy build files to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.FRONTEND_DEPLOY_KEY }}
+          source: "jarvis-frontend/dist/**"
+          target: "/usr/share/nginx/html"
+          port: 22
+          timeout: 60s
+          command_timeout: 30s
+          debug: true
+          overwrite: true
+          rm: true
+          strip_components: 2   # ✅ This removes the nested dist folder layer
+
+      - name: 🚀 Restart Nginx on EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.FRONTEND_DEPLOY_KEY }}
+          script_stop: true
+          script: |
+            echo "🟡 Checking Nginx directory..."
+            ls -la /usr/share/nginx/html
+            echo "🟡 Fixing permissions..."
+            sudo chown -R ubuntu:www-data /usr/share/nginx/html
+            sudo chmod -R 775 /usr/share/nginx/html
+            sudo systemctl restart nginx
+            echo "✅ Nginx restarted successfully."
+            echo "🌐 Deployment live at: http://${{ secrets.EC2_HOST }}/"

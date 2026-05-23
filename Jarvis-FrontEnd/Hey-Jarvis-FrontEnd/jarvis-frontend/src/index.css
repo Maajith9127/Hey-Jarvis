@@ -1,0 +1,312 @@
+@import "tailwindcss";
+
+:root {
+  @apply bg-slate-100;
+}
+
+input {
+  @apply px-4 py-3 rounded-lg border border-slate-300 bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm;
+}
+
+/* Calendar header */
+.fc-header-toolbar {
+  @apply sticky top-0 z-30 w-full bg-slate-200 backdrop-blur-none m-0 p-0;
+}
+
+.fc-toolbar-title {
+  @apply text-2xl font-semibold text-slate-800 tracking-tight;
+}
+
+/* Calendar buttons */
+.fc .fc-button {
+  @apply bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-medium shadow-md;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  @apply bg-gradient-to-r from-indigo-700 to-indigo-800 shadow-lg ring-2 ring-indigo-300 ring-offset-2;
+}
+
+.fc .fc-button-primary:disabled {
+  @apply bg-gradient-to-r from-indigo-300 to-indigo-400 opacity-60 cursor-not-allowed;
+}
+
+/* Today highlight */
+.fc .fc-daygrid-day.fc-day-today {
+  @apply bg-gradient-to-br from-blue-50 to-indigo-50 ring-2 ring-indigo-200 ring-offset-1;
+}
+
+/* Calendar cells */
+.fc-daygrid-day-frame {
+  @apply hover:bg-slate-50/80;
+}
+
+.fc-day-sat,
+.fc-day-sun {
+  @apply bg-slate-50/60;
+}
+
+/* Events styling */
+.fc-h-event {
+  @apply bg-gradient-to-r from-black to-blue-600 border-l-4 border-blue-800 overflow-hidden shadow-md hover:from-blue-600 hover:to-blue-700 backdrop-blur-sm;
+}
+
+.fc-v-event {
+  @apply bg-gradient-to-b from-blue-500 to-blue-600 border-l-4 border-blue-800 overflow-hidden shadow-md hover:from-blue-600 hover:to-blue-700 backdrop-blur-sm;
+}
+
+.fc-event-title {
+  @apply font-medium text-white/95 tracking-wide;
+}
+
+/* Calendar body */
+.fc-view {
+  @apply w-full bg-white;
+  height: auto !important;
+}
+
+.fc-scrollgrid-sync-table {
+  @apply w-full;
+}
+
+/* Draggable elements */
+.draggable-elements {
+  @apply mt-8 p-6 bg-white/70 backdrop-blur-md rounded-xl shadow-xl border border-slate-200/50;
+}
+
+.draggable-elements h1 {
+  @apply text-xl font-semibold text-slate-800 mb-4 tracking-tight;
+}
+
+.aaa {
+  @apply border-l-4 border-blue-800 bg-gradient-to-r from-blue-500 to-indigo-600 text-white mt-3 p-3 rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 cursor-grab;
+}
+
+/* Basic scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(148, 163, 184, 0.1);
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #4338ca, #3730a3);
+}
+
+.ScrollBar_Elements {
+  cursor: grab;
+}
+
+.ScrollBar_Elements:active {
+  cursor: grabbing;
+}
+
+/* Accountability events */
+.accountability-event {
+  @apply bg-gradient-to-r from-red-500 to-red-600 border-l-4 border-red-800 text-white shadow-md hover:from-red-600 hover:to-red-700;
+}
+
+.fc .fc-timegrid-slot:nth-child(5n) {
+  background: linear-gradient(90deg, transparent 0%, rgba(148, 163, 184, 0.1) 50%, transparent 100%);
+}
+
+.accountability-event.verified {
+  @apply bg-gradient-to-r from-green-500 to-green-600 border-green-800 hover:from-green-600 hover:to-green-700;
+}
+
+.randomised-accountability {
+  @apply bg-gradient-to-r   border-red-600 border-b-0 border-r-0 border-t-0 text-white shadow-md ;
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 480px) {
+  .fc .fc-toolbar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0.75rem;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .fc .fc-toolbar-chunk {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap;
+    text-align: center;
+    flex-shrink: 1;
+    color: #1e293b;
+  }
+
+  .fc .fc-button {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 0.5rem !important;
+    min-width: auto !important;
+    flex-shrink: 0;
+    backdrop-filter: blur(8px);
+  }
+}
+
+@media (max-width: 480px) {
+  .fc .fc-header-toolbar {
+    margin-bottom: 1rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  .fc .fc-toolbar {
+    margin-bottom: 1rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  .fc .fc-view-harness {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .fc {
+    transform: scale(0.96);
+    transform-origin: top center;
+    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.1));
+  }
+
+  .fc .fc-view-harness {
+    padding-bottom: 1.5rem !important;
+  }
+}
+
+/* Basic styling */
+.fc-daygrid-day-number {
+  @apply text-slate-700 font-medium hover:text-indigo-600;
+}
+
+.fc-col-header-cell {
+  @apply bg-gradient-to-b from-slate-50 to-slate-100 text-slate-700 font-semibold tracking-wide border-b border-slate-200;
+}
+
+.fc-scrollgrid {
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+.fc-scrollgrid td,
+.fc-scrollgrid th {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+.Scrollbar {
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scroll look */
+.Scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.Scrollbar::-webkit-scrollbar-thumb {
+  background-color: #a5b4fc;
+  border-radius: 8px;
+}
+
+.Scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* This makes the bottom resize handle big enough to drag with a finger */
+.fc-event-resizer {
+  height: 20px;
+  width: 100%;
+  bottom: 0;
+  position: absolute;
+  cursor: ns-resize;
+  background: rgba(0, 0, 0, 0.1);
+  touch-action: none;
+}
+
+/* This makes overlapping events stack vertically, not side-by-side */
+.fc-v-event {
+  width: 100% !important;
+  left: 0 !important;
+}
+
+/* Faded version for strict mode */
+.strict-mode {
+  @apply opacity-30;
+}
+
+/* Remove all gaps between toolbar and calendar body */
+.fc {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+
+.fc-header-toolbar {
+  @apply sticky top-0 z-30 w-full bg-slate-200 backdrop-blur-none;
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.fc-view-harness {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.fc-scrollgrid-section {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.fc-scrollgrid {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+}
+
+.fc-toolbar-chunk {
+  margin: 0 !important;
+}
+
+.fc-header-toolbar {
+  @apply sticky top-0 z-30 bg-slate-200 backdrop-blur-none m-0 p-0;
+  border-radius: 0 !important;
+}
+
+/* Also target any child elements that might have rounded corners */
+.fc-toolbar {
+  border-radius: 0 !important;
+}
+
+.fc-toolbar-chunk {
+  border-radius: 0 !important;
+}
