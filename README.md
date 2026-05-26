@@ -97,14 +97,33 @@ Hey-Jarvis/
 
 ---
 
-## Screenshots
+## Screenshots & Workflow Walkthrough
 
-Here is the "before" look of my initial web prototype compared to the native Android transition:
+Here is the user interface of the Hey-Jarvis web prototype, illustrating the core accountability workflow:
 
-### Web Prototype Dashboard (Hey-Jarvis)
-*Add your web interface screenshots here:*
-<!-- Place screenshots/gifs here -->
-![Web Dashboard](Jarvis-BackEnd/photo-1570829460005-c840387bb1ca.jpg)
+### 1. Dashboard Overview
+The main interface features a drag-and-drop calendar/timeline where users schedule their commitments, side-by-side with configuration panels for penalties and task templates.
+
+![Dashboard Overview](screenshots/{5A970AEA-1AAD-475A-9D33-8E2C53517092}.png)
+
+### 2. Live Photo Task Templates
+Create specific tasks that require photo verification (e.g., Gym, Library). You click the live photo button, add your reference verification photos, and name the task category.
+
+![Live Photo Task Templates](screenshots/{26E224A0-6EA3-4E31-8E80-92AC717FD9D6}.png)
+
+### 3. Consequence and Penalty Configuration
+Configure the stakes on the right-hand panel. You can set a monetary penalty or define "cringe consequences" (e.g., sending an embarrassing message, playing a specific video, etc.) to trigger upon failure.
+
+![Consequence Setup](screenshots/{9AF37AE7-D877-4C48-A70A-8E7589A542EC}.png)
+
+### 4. Interactive Calendar Scheduling & Verification Windows
+- **Drag-and-Drop Events:** Drag a blue task event (e.g., "Gym") from your templates onto the calendar to schedule it (e.g., 6:00 AM - 7:00 AM).
+- **Overlapping Penalties:** Drag a red penalty block from the right-hand panel and overlap it onto the blue calendar event.
+- **Strict Verification Window:** The overlapping region determines your window of verification. For example, if you schedule the gym from 6:00 AM to 7:00 AM but the penalty overlaps from 6:00 AM to 6:10 AM, you **must** submit verification within that specific 10-minute slot, or the penalty is automatically executed. The same logic applies to randomized check-ins.
+
+![Calendar and Overlapping Penalty Logic](screenshots/{36502878-61D7-4ED1-9131-B6634D82C7D7}.png)
+
+---
 
 ### Native Android Successor (CommitT)
 *Check out the Android counterpart:* [CommitT Repository](https://github.com/Maajith9127/CommitT)
